@@ -1,61 +1,45 @@
-from flask import Flask,request,make_response
-import os,json
-import pyowm
-import os
+from flask import Flask, render_template, request 
 
-app = Flask(__name__)
-owmapikey=os.environ.get('c7258453da79906d58e0cf0e26e1ab7a') #or provide your key here
-owm = pyowm.OWM(owmapikey)
+# import json to load JSON data to a python dictionary 
+import json 
 
-#geting and sending response to dialogflow
-@app.route('/webhook', methods=['POST'])
-def webhook():
-    req = request.get_json(silent=True, force=True)
+# urllib.request to make a request to api 
+import urllib.request 
 
-    print("Request:")
-    print(json.dumps(req, indent=4))
-    
-    res = processRequest(req)
 
-    res = json.dumps(res, indent=4)
-    print(res)
-    r = make_response(res)
-    r.headers['Content-Type'] = 'application/json'
-    return r
+app = Flask(__name__) 
 
-#processing the request from dialogflow
-def processRequest(req):
-    
-    result = req.get("result")
-    parameters = result.get("parameters")
-    city = parameters.get("city_name")
-    observation = owm.weather_at_place(city)
-    w = observation.get_weather()
-    latlon_res = observation.get_location()
-    lat=str(latlon_res.get_lat())
-    lon=str(latlon_res.get_lon())
-     
-    wind_res=w.get_wind()
-    wind_speed=str(wind_res.get('speed'))
-    
-    humidity=str(w.get_humidity())
-    
-    celsius_result=w.get_temperature('celsius')
-    temp_min_celsius=str(celsius_result.get('temp_min'))
-    temp_max_celsius=str(celsius_result.get('temp_max'))
-    
-    fahrenheit_result=w.get_temperature('fahrenheit')
-    temp_min_fahrenheit=str(fahrenheit_result.get('temp_min'))
-    temp_max_fahrenheit=str(fahrenheit_result.get('temp_max'))
-    speech = "Today the weather in " + city + ": \n" + "Temperature in Celsius:\nMax temp :"+temp_max_celsius+".\nMin Temp :"+temp_min_celsius+".\nTemperature in Fahrenheit:\nMax temp :"+temp_max_fahrenheit+".\nMin Temp :"+temp_min_fahrenheit+".\nHumidity :"+humidity+".\nWind Speed :"+wind_speed+"\nLatitude :"+lat+".\n  Longitude :"+lon
-    
-    return {
-        "speech": speech,
-        "displayText": speech,
-        "source": "dialogflow-weather-by-satheshrgs"
-        }
-    
-if __name__ == '__main__':
-    port = int(os.getenv('PORT', 5000))
-    print("Starting app on port %d" % port)
-    app.run(debug=False, port=port, host='0.0.0.0')
+@app.route('/', methods =['POST', 'GET']) 
+def weather(): 
+	if request.method == 'POST': 
+		city = request.form['city'] 
+	else: 
+		# for default name mathura 
+		city = 'mathura'
+
+	# your API key will come here 
+	api = api_key_here 
+
+	# source contain json data from api 
+	source = urllib.request.urlopen('http://api.openweathermap.org/data/2.5/weather?q =' + city + '&appid =' + api).read() 
+
+	# converting JSON data to a dictionary 
+	list_of_data = json.loads(source) 
+
+	# data for variable list_of_data 
+	data = { 
+		"country_code": str(list_of_data['sys']['country']), 
+		"coordinate": str(list_of_data['coord']['lon']) + ' '
+					+ str(list_of_data['coord']['lat']), 
+		"temp": str(list_of_data['main']['temp']) + 'k', 
+		"pressure": str(list_of_data['main']['pressure']), 
+		"humidity": str(list_of_data['main']['humidity']), 
+	} 
+	print(data) 
+	return render_template('index.html', data = data) 
+
+
+
+if __name__ == '__main__': 
+	app.run(debug = True) 
+
