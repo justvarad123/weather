@@ -12,7 +12,6 @@
 
   <!-- Latest compiled JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-
 </head>
 
 <body>
@@ -30,18 +29,18 @@
             <i class="glyphicon glyphicon-search"></i>
           </button>
         </div>
-        <form>
+        </form>
   </center>
   <div class="row">
-    {% if data.country_code and data.coordinate and data.temp and data.pressure and data.humidity %}
+    {% if data.tempe and data.pressure and data.humidity and data.rep %}
     <div class="col-md-6 col-md-offset-3">
-      <h3>country code : {{data.country_code}}</h1>
-        <h5>City name : {{data.cityname}}</h5>
-        <h5>coordinate : {{data.coordinate}}</h5>
-        <h5>temp (in kelvin) : {{data.temp}}</h5>
-        <h5>temp (in celcius) : {{data.temp_cel}}</h5>
-        <h5>pressure : {{data.pressure}} </h5>
-        <h5>humidity : {{data.humidity}}</h5>
+      
+        <h5>Temperature (in celcius) : {{data.tempe}}</h5>
+        <h5>Pressure : {{data.pressure}} </h5>
+        <h5>Humidity : {{data.humidity}}</h5>
+        <h5>Weather Report : {{data.rep}}</h5>
+
+
     </div>
     {% endif %}
   </div>
